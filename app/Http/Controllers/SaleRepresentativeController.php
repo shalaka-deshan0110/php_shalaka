@@ -6,6 +6,7 @@ use App\Models\SaleRepresentative;
 use App\Repositories\Eloquent\SaleRepresentativesRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class SaleRepresentativeController extends Controller
 {
@@ -25,7 +26,7 @@ class SaleRepresentativeController extends Controller
     public function index()
     {
 
-        $this->user =Auth::guard('web')->user();
+        $this->user = Auth::guard('web')->user();
         $saleRepresentatives = $this->saleRepresentativeRepo->all($this->user);
 
         return view('sale-representatives.index', compact('saleRepresentatives'));
@@ -53,14 +54,14 @@ class SaleRepresentativeController extends Controller
             'name' => 'required',
             'email' => 'required|email',
             'telephone' => 'required',
-            'joined_date' =>'required|date',
+            'joined_date' => 'required|date',
             'current_route' => 'required',
             'comment' => 'required'
         ]);
 
         $saleRepresentative = $this->saleRepresentativeRepo->create($request->all());
 
-        return redirect('/sale-representatives')->with('success','Sale Representative created successfully!');
+        return redirect('/sale-representatives')->with('success', 'Sales Representative created successfully!');
     }
 
     /**
@@ -71,7 +72,7 @@ class SaleRepresentativeController extends Controller
      */
     public function show(SaleRepresentative $saleRepresentative)
     {
-        //
+        return view('sale-representatives.show',compact('saleRepresentative'));
     }
 
     /**
@@ -82,7 +83,7 @@ class SaleRepresentativeController extends Controller
      */
     public function edit(SaleRepresentative $saleRepresentative)
     {
-        //
+        return view('sale-representatives.edit', compact('saleRepresentative'));
     }
 
     /**
@@ -94,7 +95,23 @@ class SaleRepresentativeController extends Controller
      */
     public function update(Request $request, SaleRepresentative $saleRepresentative)
     {
-        //
+        $request->validate([
+            'name' => 'required',
+            'email' => [
+                'required',
+                Rule::unique('users')->ignore($saleRepresentative->id),
+            ],
+            'telephone' => 'required',
+            'joined_date' => 'required|date',
+            'current_route' => 'required',
+            'comment' => 'required'
+        ]);
+
+        $id = $saleRepresentative->id;
+
+        $saleRepresentative = $this->saleRepresentativeRepo->update($request->all(), $id);
+
+        return redirect('/sale-representatives')->with('success', 'Sales Representative created successfully!');
     }
 
     /**
@@ -105,6 +122,8 @@ class SaleRepresentativeController extends Controller
      */
     public function destroy(SaleRepresentative $saleRepresentative)
     {
-        //
+        $saleRepresentative->delete();
+        return redirect('/sale-representatives')
+            ->with('success', 'Sales Representative has been deleted successfully');
     }
 }

@@ -62,10 +62,21 @@ class SaleRepresentativesRepository implements BaseRepositoryInterface
 
 
 
-    public function update(array $data): Model
+    public function update(array $attributes, int $id): Model
     {
-        #TODO
-        return $this->salerepresentative;
+
+        $saleRepresentative = SaleRepresentative::where('id', $id)
+        ->update([
+            'name' => $attributes['name'],
+            'email' => $attributes['email'],
+            'telephone' => $attributes['telephone'],
+            'current_route' => $attributes['current_route'],
+            'comment' => $attributes['comment'],
+            'joined_date' => $attributes['joined_date'],
+            'manager_id' => Auth::user()->id
+        ]);
+
+        return SaleRepresentative::find($id)->refresh();
     }
 
     public function delete($id)
