@@ -3,10 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\SaleRepresentative;
+use App\Repositories\Eloquent\SaleRepresentativesRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class SaleRepresentativeController extends Controller
 {
+    protected $saleRepresentativeRepo;
+    protected $user;
+
+    public function __construct(SaleRepresentativesRepository $saleRepresentativesRepository)
+    {
+        $this->saleRepresentativeRepo = $saleRepresentativesRepository;
+        $this->user = Auth::guard('web')->user();
+    }
     /**
      * Display a listing of the resource.
      *
@@ -14,7 +24,11 @@ class SaleRepresentativeController extends Controller
      */
     public function index()
     {
-        //
+
+        $this->user =Auth::guard('web')->user();
+        $saleRepresentatives = $this->saleRepresentativeRepo->all($this->user);
+
+        return view('sale-representatives.index', compact('saleRepresentatives'));
     }
 
     /**
@@ -24,7 +38,7 @@ class SaleRepresentativeController extends Controller
      */
     public function create()
     {
-        //
+        return view('sale-representatives.create');
     }
 
     /**
@@ -35,7 +49,18 @@ class SaleRepresentativeController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required',
+            'email' => 'required|email',
+            'telephone' => 'required',
+            'joined_date' =>'required|date',
+            'current_route' => 'required',
+            'comment' => 'required'
+        ]);
+
+        $saleRepresentative = $this->saleRepresentativeRepo->create($request->all());
+
+        return redirect('/sale-representatives')->with('success','Sale Representative created successfully!');
     }
 
     /**
