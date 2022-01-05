@@ -72,7 +72,7 @@ class SaleRepresentativeController extends Controller
      */
     public function show(SaleRepresentative $saleRepresentative)
     {
-        return view('sale-representatives.show',compact('saleRepresentative'));
+        return json_encode($saleRepresentative);
     }
 
     /**

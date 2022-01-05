@@ -11286,11 +11286,3 @@ textarea.form-control-lg {
     display: none !important;
   }
 }
-.pagination {
-    display: -ms-flexbox;
-    flex-wrap: wrap;
-    display: flex;
-    padding-left: 0;
-    list-style: none;
-    border-radius: 0.25rem;
-}
